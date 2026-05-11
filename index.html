@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="VidAI — Professional AI video studio. Nine specialized agents covering scripting, shot lists, color grading, audio design, thumbnails, and more. Start free."/>
+<meta property="og:title" content="VidAI — AI Video Studio"/>
+<meta property="og:description" content="Nine AI agents for every stage of video production. Script to upload, all in one workspace."/>
+<meta property="og:image" content="https://vidai.app/og-image.png"/>
+<meta property="og:url" content="https://vidai.app"/>
+<meta property="og:type" content="website"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="VidAI — AI Video Studio"/>
+<meta name="twitter:description" content="Nine AI agents for every stage of video production."/>
+<meta name="theme-color" content="#060610"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>"/>
+<title>VidAI — AI Video Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#060610;--ink1:#0C0C1C;--ink2:#111124;--ink3:#181832;
+  --rim:rgba(255,255,255,.07);--rim2:rgba(255,255,255,.12);--rim3:rgba(255,255,255,.22);
+  --glass:rgba(255,255,255,.025);--glass2:rgba(255,255,255,.05);--glass3:rgba(255,255,255,.09);
+  --snow:#EEEEFF;--snow2:#A0A0C0;--fog:rgba(160,160,192,.4);--fog2:rgba(160,160,192,.2);
+  --a:#00D2FF;--ah:#33DBFF;--al:rgba(0,210,255,.12);--ag:rgba(0,210,255,.22);
+  --ok:#22C55E;--g:#F4BF00;--err:#EF4444;
+  --sans:'Plus Jakarta Sans',system-ui,sans-serif;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{
+  background:var(--ink);color:var(--snow);font-family:var(--sans);
+  min-height:100vh;overflow-x:hidden;
+}
+
+/* ── BACKGROUND ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% -10%,rgba(0,210,255,.07),transparent 55%),
+    radial-gradient(ellipse 55% 65% at 92% 110%,rgba(139,92,246,.06),transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 45%,rgba(0,210,255,.025),transparent 65%);
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--rim) 1px,transparent 1px),linear-gradient(90deg,var(--rim) 1px,transparent 1px);
+  background-size:52px 52px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 10%,transparent 100%);
+  opacity:.45;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px var(--ag)}50%{box-shadow:0 0 40px var(--ag),0 0 80px rgba(0,210,255,.12)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+.anim-up{opacity:0;animation:fadeUp .7s var(--ease) forwards}
+.delay-1{animation-delay:.1s}
+.delay-2{animation-delay:.22s}
+.delay-3{animation-delay:.34s}
+.delay-4{animation-delay:.46s}
+.delay-5{animation-delay:.58s}
+
+/* ── LAYOUT ── */
+*{position:relative;z-index:1}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+section{padding:96px 0}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:60px;display:flex;align-items:center;
+  padding:0 32px;
+  transition:background .3s,border-color .3s,backdrop-filter .3s;
+}
+nav.scrolled{background:rgba(6,6,16,.82);border-bottom:1px solid var(--rim);backdrop-filter:blur(20px)}
+.nav-inner{max-width:1100px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-mark{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--a),rgba(0,210,255,.45));
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 16px var(--ag);
+}
+.nav-logo-name{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--snow)}
+.nav-logo-name em{color:var(--a);font-style:normal}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--fog);text-decoration:none;transition:color .15s,background .15s}
+.nav-link:hover{color:var(--snow);background:var(--glass2)}
+.nav-cta{
+  padding:8px 20px;border-radius:9px;font-size:13px;font-weight:700;
+  background:var(--a);color:var(--ink);text-decoration:none;
+  box-shadow:0 4px 16px var(--ag);transition:all .2s;letter-spacing:.2px;
+}
+.nav-cta:hover{background:var(--ah);transform:translateY(-1px);box-shadow:0 6px 24px var(--ag)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:120px 24px 80px;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 14px;border-radius:20px;
+  background:var(--al);border:1px solid rgba(0,210,255,.25);
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--a);font-family:var(--mono);margin-bottom:28px;
+}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--a);box-shadow:0 0 8px var(--a);animation:glow 2s ease infinite}
+.hero-h1{
+  font-size:clamp(44px,7vw,88px);
+  font-weight:800;letter-spacing:-3px;line-height:.97;
+  margin-bottom:24px;max-width:920px;
+}
+.hero-h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--a) 0%,rgba(0,210,255,.5) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-h1 .serif-word{
+  font-family:var(--serif);font-style:italic;font-weight:300;letter-spacing:-.5px;
+}
+.hero-sub{
+  font-size:clamp(16px,2vw,20px);color:var(--snow2);
+  font-family:var(--serif);font-style:italic;line-height:1.65;
+  max-width:560px;margin:0 auto 40px;
+}
+.hero-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:56px}
+.btn-hero{
+  padding:14px 32px;border-radius:12px;font-size:15px;font-weight:700;
+  letter-spacing:.2px;text-decoration:none;transition:all .2s;
+  display:inline-flex;align-items:center;gap:8px;
+  position:relative;overflow:hidden;
+}
+.btn-hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);pointer-events:none}
+.btn-hero.primary{background:var(--a);color:var(--ink);box-shadow:0 6px 24px var(--ag)}
+.btn-hero.primary:hover{background:var(--ah);transform:translateY(-2px);box-shadow:0 10px 32px var(--ag)}
+.btn-hero.secondary{background:var(--glass2);border:1px solid var(--rim2);color:var(--snow2)}
+.btn-hero.secondary:hover{background:var(--glass3);border-color:var(--rim3);color:var(--snow)}
+.hero-social-proof{display:flex;align-items:center;gap:16px;color:var(--fog);font-size:12px;font-family:var(--mono)}
+.hero-avatars{display:flex}
+.hero-avatar{
+  width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);
+  background:linear-gradient(135deg,var(--a),rgba(139,92,246,.8));
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:var(--ink);margin-left:-8px;
+}
+.hero-avatar:first-child{margin-left:0}
+.hero-star{color:var(--g)}
+
+/* ── BROWSER MOCKUP ── */
+.hero-mockup{
+  max-width:900px;width:100%;margin:0 auto;
+  border-radius:16px;overflow:hidden;
+  border:1px solid var(--rim2);
+  box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.03);
+  animation:float 6s ease-in-out infinite;
+}
+.mockup-bar{
+  background:var(--ink2);border-bottom:1px solid var(--rim);
+  padding:12px 16px;display:flex;align-items:center;gap:12px;
+}
+.mockup-dots{display:flex;gap:6px}
+.mockup-dot{width:10px;height:10px;border-radius:50%}
+.mockup-dot.r{background:#EF4444}.mockup-dot.y{background:#F4BF00}.mockup-dot.g{background:#22C55E}
+.mockup-url{
+  flex:1;background:var(--glass);border:1px solid var(--rim);border-radius:6px;
+  padding:5px 12px;font-size:11px;font-family:var(--mono);color:var(--fog);
+  text-align:center;
+}
+.mockup-body{
+  background:var(--ink1);padding:0;
+  display:grid;grid-template-columns:180px 1fr;min-height:420px;
+}
+.mockup-sidebar{
+  background:rgba(11,11,26,.8);border-right:1px solid var(--rim);
+  padding:16px 0;
+}
+.mockup-sb-logo{
+  display:flex;align-items:center;gap:8px;padding:0 14px 16px;
+  border-bottom:1px solid var(--rim);margin-bottom:8px;
+}
+.mockup-sb-mark{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--a),rgba(0,210,255,.5));display:flex;align-items:center;justify-content:center;font-size:11px}
+.mockup-sb-name{font-size:11px;font-weight:800;letter-spacing:-.2px}
+.mockup-sb-name em{color:var(--a);font-style:normal}
+.mockup-sb-section{padding:10px 14px 3px;font-size:7px;font-weight:700;letter-spacing:2px;color:rgba(160,160,192,.3);text-transform:uppercase;font-family:var(--mono)}
+.mockup-nav-item{
+  display:flex;align-items:center;gap:6px;padding:5px 10px;margin:1px 6px;
+  border-radius:7px;font-size:9px;color:rgba(160,160,192,.45);
+}
+.mockup-nav-item.active{background:var(--glass3);border:1px solid var(--rim);color:var(--snow)}
+.mockup-nav-item.active::before{content:'';position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:2px;height:12px;border-radius:1px;background:var(--a)}
+.mockup-nav-icon{font-size:10px}
+.mockup-chat{padding:20px;display:flex;flex-direction:column;gap:14px}
+.mockup-chat-title{font-size:13px;font-weight:700;letter-spacing:-.2px;margin-bottom:4px}
+.mockup-bubble{
+  padding:10px 13px;border-radius:10px;font-size:10px;line-height:1.65;
+  font-family:var(--serif);font-style:italic;
+}
+.mockup-bubble.user{background:var(--glass2);border:1px solid var(--rim2);border-radius:10px 3px 10px 10px;align-self:flex-end;max-width:70%;color:var(--snow2)}
+.mockup-bubble.ai{background:var(--glass);border:1px solid var(--rim);border-radius:3px 10px 10px 10px;max-width:90%;color:rgba(192,192,224,.8)}
+.mockup-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:2px 7px;
+  border-radius:4px;background:rgba(0,210,255,.12);border:1px solid rgba(0,210,255,.2);
+  font-size:7px;font-weight:700;letter-spacing:1.5px;color:var(--a);font-family:var(--mono);
+}
+.mockup-typing{display:flex;align-items:center;gap:4px;padding:8px 12px;background:var(--glass);border:1px solid var(--rim);border-radius:3px 10px 10px 10px;width:fit-content}
+.mockup-dot-anim{width:4px;height:4px;border-radius:50%;background:var(--a);opacity:.4}
+
+/* ── LOGOS / TRUST ── */
+.logos-section{padding:48px 0;border-top:1px solid var(--rim);border-bottom:1px solid var(--rim)}
+.logos-label{text-align:center;font-size:11px;font-family:var(--mono);letter-spacing:2px;color:var(--fog);text-transform:uppercase;margin-bottom:28px}
+.logos-row{display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap}
+.logo-item{font-size:13px;font-weight:700;color:rgba(160,160,192,.3);letter-spacing:.5px;white-space:nowrap}
+
+/* ── FEATURES ── */
+.features-header{text-align:center;margin-bottom:72px}
+.section-eyebrow{display:inline-flex;align-items:center;gap:7px;padding:4px 12px;border-radius:20px;background:var(--al);border:1px solid rgba(0,210,255,.2);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--a);font-family:var(--mono);margin-bottom:20px}
+.section-h2{font-size:clamp(32px,4vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin-bottom:16px}
+.section-h2 em{font-style:normal;color:var(--a)}
+.section-sub{font-size:17px;color:var(--snow2);font-family:var(--serif);font-style:italic;line-height:1.65;max-width:520px;margin:0 auto}
+
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px}
+.agent-card{
+  background:var(--glass);border:1px solid var(--rim);border-radius:16px;
+  padding:24px;transition:all .25s;overflow:hidden;
+}
+.agent-card::before{content:'';position:absolute;inset:0;opacity:0;background:linear-gradient(135deg,var(--al),transparent);transition:opacity .25s;pointer-events:none}
+.agent-card:hover{border-color:var(--rim2);transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.4)}
+.agent-card:hover::before{opacity:1}
+.agent-card-stripe{position:absolute;top:0;left:0;right:0;height:1px;opacity:.6}
+.agent-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.agent-emoji{font-size:28px;line-height:1}
+.agent-phase{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--mono);padding:3px 8px;border-radius:4px;border:1px solid var(--rim2);color:var(--fog);background:var(--glass)}
+.agent-name{font-size:17px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px}
+.agent-desc{font-size:13px;color:var(--snow2);font-family:var(--serif);font-style:italic;line-height:1.6;margin-bottom:16px}
+.agent-features{display:flex;flex-direction:column;gap:6px}
+.agent-feature{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fog)}
+.agent-feature::before{content:'→';color:var(--a);font-weight:700;flex-shrink:0}
+
+/* ── WORKFLOW ── */
+.workflow-section{background:var(--glass);border:1px solid var(--rim);border-radius:24px;padding:56px;overflow:hidden}
+.workflow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:48px}
+.workflow-step{padding:24px;border-right:1px solid var(--rim);position:relative}
+.workflow-step:last-child{border-right:none}
+.workflow-step-num{font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;opacity:.08;margin-bottom:16px}
+.workflow-step-icon{font-size:24px;margin-bottom:12px}
+.workflow-step-name{font-size:14px;font-weight:700;margin-bottom:6px}
+.workflow-step-desc{font-size:12px;color:var(--fog);line-height:1.6;font-family:var(--serif);font-style:italic}
+.workflow-arrow{position:absolute;right:-12px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:var(--al);border:1px solid rgba(0,210,255,.3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--a);z-index:2}
+.workflow-step:last-child .workflow-arrow{display:none}
+
+/* ── STATS ── */
+.stats-section{padding:80px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rim)}
+.stat-item{background:var(--ink);padding:40px 32px;text-align:center}
+.stat-num{font-size:48px;font-weight:800;letter-spacing:-2px;color:var(--a);line-height:1;margin-bottom:8px}
+.stat-label{font-size:12px;font-family:var(--mono);color:var(--fog);letter-spacing:1px;text-transform:uppercase}
+
+/* ── PRICING ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;margin:0 auto}
+.price-card{
+  background:var(--glass);border:1px solid var(--rim);border-radius:20px;
+  padding:32px 24px;position:relative;overflow:hidden;transition:all .2s;
+}
+.price-card:hover{border-color:var(--rim2);transform:translateY(-2px)}
+.price-card.featured{border-color:rgba(0,210,255,.4);background:rgba(0,210,255,.05)}
+.price-card.featured::before{content:'MOST POPULAR';position:absolute;top:0;left:0;right:0;background:var(--a);color:var(--ink);font-size:8px;font-weight:800;letter-spacing:2.5px;padding:5px;text-align:center}
+.price-card.featured{padding-top:38px}
+.price-tier{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--fog);font-family:var(--mono);margin-bottom:12px}
+.price-amount{font-size:42px;font-weight:800;letter-spacing:-1.5px;line-height:1;margin-bottom:4px}
+.price-period{font-size:12px;color:var(--fog);font-family:var(--mono);margin-bottom:24px}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.price-features li{font-size:13px;color:var(--snow2);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.price-features li::before{content:'✓';color:var(--a);font-weight:800;flex-shrink:0;margin-top:1px}
+.price-features li.muted{color:var(--fog)}.price-features li.muted::before{content:'–';color:var(--fog)}
+.price-cta{
+  display:block;width:100%;padding:13px;border-radius:11px;
+  text-align:center;text-decoration:none;font-size:13px;font-weight:700;
+  letter-spacing:.3px;transition:all .2s;border:1px solid var(--rim2);
+  color:var(--snow2);background:var(--glass2);
+}
+.price-cta:hover{background:var(--glass3);border-color:var(--rim3);color:var(--snow)}
+.price-cta.primary{background:var(--a);border-color:transparent;color:var(--ink);box-shadow:0 4px 16px var(--ag)}
+.price-cta.primary:hover{background:var(--ah);transform:translateY(-1px);box-shadow:0 8px 24px var(--ag)}
+.pricing-note{text-align:center;font-size:12px;color:var(--fog);font-family:var(--mono);margin-top:20px}
+
+/* ── CTA SECTION ── */
+.cta-section{
+  background:linear-gradient(135deg,rgba(0,210,255,.06),rgba(139,92,246,.04));
+  border:1px solid rgba(0,210,255,.15);border-radius:24px;
+  padding:72px 48px;text-align:center;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,210,255,.12),transparent 70%);
+  pointer-events:none;
+}
+.cta-h2{font-size:clamp(32px,4vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin-bottom:16px}
+.cta-sub{font-size:17px;color:var(--snow2);font-family:var(--serif);font-style:italic;line-height:1.65;max-width:480px;margin:0 auto 36px}
+.cta-guarantee{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:var(--fog);font-family:var(--mono);margin-top:18px}
+
+/* ── FAQ ── */
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:880px;margin:0 auto}
+.faq-item{}
+.faq-q{font-size:15px;font-weight:700;margin-bottom:8px;letter-spacing:-.2px}
+.faq-a{font-size:13px;color:var(--snow2);font-family:var(--serif);font-style:italic;line-height:1.7}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--rim);padding:48px 0 32px}
+.footer-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:40px}
+.footer-brand{}
+.footer-brand-name{font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px}
+.footer-brand-name em{color:var(--a);font-style:normal}
+.footer-brand-desc{font-size:12px;color:var(--fog);font-family:var(--serif);font-style:italic;max-width:220px;line-height:1.6}
+.footer-links{display:flex;gap:48px;flex-wrap:wrap}
+.footer-col-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--fog);font-family:var(--mono);margin-bottom:14px}
+.footer-link{display:block;font-size:13px;color:rgba(160,160,192,.45);text-decoration:none;margin-bottom:8px;transition:color .15s}
+.footer-link:hover{color:var(--snow)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:24px;border-top:1px solid var(--rim);gap:16px;flex-wrap:wrap}
+.footer-copy{font-size:11px;color:var(--fog);font-family:var(--mono)}
+.footer-badges{display:flex;gap:12px}
+.footer-badge{font-size:10px;font-family:var(--mono);color:var(--fog);padding:3px 8px;border-radius:4px;border:1px solid var(--rim);background:var(--glass)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .workflow-steps{grid-template-columns:1fr 1fr}
+  .workflow-step{border-right:none;border-bottom:1px solid var(--rim)}
+  .workflow-step:last-child,.workflow-step:nth-child(even){border-right:none}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .faq-grid{grid-template-columns:1fr}
+  .workflow-section{padding:32px 24px}
+  section{padding:64px 0}
+  .hero{padding:100px 24px 64px}
+  .cta-section{padding:48px 24px}
+  .footer-links{gap:28px}
+  .agents-grid{grid-template-columns:1fr}
+  .nav-links .nav-link{display:none}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .mockup-body{grid-template-columns:1fr}
+  .mockup-sidebar{display:none}
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rim2);border-radius:2px}
+::selection{background:rgba(0,210,255,.2);color:var(--snow)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">🎬</div>
+      <span class="nav-logo-name">Vid<em>AI</em></span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#workflow" class="nav-link">Workflow</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="#faq" class="nav-link">FAQ</a>
+      <a href="app.html" class="nav-cta">Start free →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge anim-up">
+    <span class="hero-badge-dot"></span>
+    Now powered by Claude Sonnet
+  </div>
+  <h1 class="hero-h1 anim-up delay-1">
+    Your complete<br/>
+    <em>AI video</em><br/>
+    <span class="serif-word">production studio.</span>
+  </h1>
+  <p class="hero-sub anim-up delay-2">
+    Nine specialized agents covering every phase — from first draft to final upload. Script, shoot, edit, grade, and publish with AI that actually knows video.
+  </p>
+  <div class="hero-actions anim-up delay-3">
+    <a href="app.html" class="btn-hero primary">Start for free — 20 credits</a>
+    <a href="#features" class="btn-hero secondary">See all 9 agents →</a>
+  </div>
+  <div class="hero-social-proof anim-up delay-4">
+    <div class="hero-avatars">
+      <div class="hero-avatar">J</div>
+      <div class="hero-avatar" style="background:linear-gradient(135deg,#A855F7,#6D28D9)">M</div>
+      <div class="hero-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">S</div>
+      <div class="hero-avatar" style="background:linear-gradient(135deg,#10B981,#06B6D4)">K</div>
+    </div>
+    <span><span class="hero-star">★★★★★</span> &nbsp;Loved by 2,400+ video creators</span>
+  </div>
+
+  <!-- Browser mockup -->
+  <div class="hero-mockup anim-up delay-5" style="margin-top:56px">
+    <div class="mockup-bar">
+      <div class="mockup-dots"><div class="mockup-dot r"></div><div class="mockup-dot y"></div><div class="mockup-dot g"></div></div>
+      <div class="mockup-url">app.vidai.app — AI Video Studio</div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-sidebar">
+        <div class="mockup-sb-logo"><div class="mockup-sb-mark">🎬</div><span class="mockup-sb-name">Vid<em>AI</em></span></div>
+        <div class="mockup-sb-section">Agents</div>
+        <div class="mockup-nav-item active"><span class="mockup-nav-icon">✍️</span> Script Writer</div>
+        <div class="mockup-nav-item"><span class="mockup-nav-icon">🎬</span> Shot List AI</div>
+        <div class="mockup-nav-item"><span class="mockup-nav-icon">🎨</span> Color Grading</div>
+        <div class="mockup-nav-item"><span class="mockup-nav-icon">🎵</span> Audio Designer</div>
+        <div class="mockup-nav-item"><span class="mockup-nav-icon">🖼️</span> Thumbnail</div>
+      </div>
+      <div class="mockup-chat">
+        <div>
+          <div class="mockup-badge">✍️ SCRIPT WRITER</div>
+          <div class="mockup-chat-title" style="margin-top:8px">Script Writer</div>
+        </div>
+        <div class="mockup-bubble user">Write me a hook for a 10-minute YouTube video about editing mistakes beginners make</div>
+        <div class="mockup-bubble ai">
+          <strong>[HOOK 0:00–0:12]</strong><br/>
+          "I've watched 500 beginner edits this year. The same three mistakes killed every single one — and I kept making them myself until about 18 months ago. Here's what they are, why they're invisible while you're editing, and exactly how to fix them before your next upload."<br/><br/>
+          <em style="opacity:.6;font-size:9px">↳ Opens with social proof, creates curiosity gap, promises specificity</em>
+        </div>
+        <div class="mockup-typing">
+          <div class="mockup-dot-anim"></div>
+          <div class="mockup-dot-anim" style="animation-delay:.2s"></div>
+          <div class="mockup-dot-anim" style="animation-delay:.4s"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST LOGOS -->
+<div class="logos-section">
+  <div class="container">
+    <div class="logos-label">Trusted by creators using</div>
+    <div class="logos-row">
+      <span class="logo-item">Adobe Premiere Pro</span>
+      <span class="logo-item">DaVinci Resolve</span>
+      <span class="logo-item">Final Cut Pro</span>
+      <span class="logo-item">Nano Banana</span>
+      <span class="logo-item">CapCut</span>
+      <span class="logo-item">YouTube Studio</span>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="features-header anim-up">
+      <div class="section-eyebrow">9 AI Agents</div>
+      <h2 class="section-h2">Every phase of production,<br/><em>covered.</em></h2>
+      <p class="section-sub">Specialized agents that understand the real craft of video — not generic AI that's never touched a timeline.</p>
+    </div>
+    <div class="agents-grid">
+      <div class="agent-card anim-up delay-1">
+        <div class="agent-card-stripe" style="background:linear-gradient(90deg,transparent,#E05C34,transparent)"></div>
+        <div class="agent-card-top"><span class="agent-emoji">✍️</span><span class="agent-phase">Pre-Production</span></div>
+        <div class="agent-name">Script Writer</div>
+        <div class="agent-desc">Generate full video scripts with hooks, timestamps, spoken language, and CTAs. Formats for YouTube, TikTok, Instagram, and documentary.</div>
+        <div class="agent-features">
+          <div class="agent-feature">Hook that stops the scroll in 5 seconds</div>
+          <div class="agent-feature">Segment timestamps auto-generated</div>
+          <div class="agent-feature">Conversational, not essay-style writing</div>
+        </div>
+      </div>
+      <div class="agent-card anim-up delay-2">
+        <div class="agent-card-stripe" style="background:linear-gradient(90deg,transparent,#00C4E8,transparent)"></div>
+        <div class="agent-card-top"><span class="agent-emoji">🎬</span><span class="agent-phase">Pre-Production</span></div>
+        <div class="agent-name">Shot List AI</div>
+        <div class="agent-desc">Professional shot lists with camera movement, focal length, lighting setup, duration estimates, and B-roll suggestions.</div>
+        <div class="agent-features">
+          <div class="agent-feature">Shot type, angle, and movement</div>
+          <div class="agent-feature">Lens and lighting recommendations</div>
+          <div class="agent-feature">B-roll cue list included</div>
+        </div>
+      </div>
+      <div class="agent-card anim-up delay-3">
+        <div class="agent-card-stripe" style="background:linear-gradient(90deg,transparent,#7C3AED,transparent)"></div>
+        <div class="agent-card-top"><span class="agent-emoji">🎥</span><span class="agent-phase">Generate</span></div>
+        <div class="agent-name">Video Generator</div>
+        <div class="agent-desc">Craft optimized text-to-video prompts for Kling 3.0, Sora 2, Veo 3.1, and Seedance. Launch directly to Nano Banana in one click.</div>
+        <div class="agent-features">
+          <div class="agent-feature">Prompts tuned per AI model</div>
+          <div class="agent-feature">Camera, lighting, and style controls</div>
+          <div class="agent-feature">One-click launch to Nano Banana</div>
+        </div>
+      </div>
+      <div class="agent-card anim-up delay-1">
+        <div class="agent-card-stripe" style="background:linear-gradient(90deg,transparent,#EF4444,transparent)"></div>
+        <div class="agent-card-top"><span class="agent-emoji">✂️</span><span class="agent-phase">Post-Production</span></div>
+        <div class="agent-name">Edit Pacing</div>
+        <div class="agent-desc">Rhythm guides, transition recommendations, music sync strategy, and platform-specific retention optimization.</div>
+        <div class="agent-features">
+          <div class="agent-feature">Cuts-per-minute by section</div>
+          <div class="agent-feature">J-cut, L-cut, match cut timing</div>
+          <div class="agent-feature">YouTube retention arc analysis</div>
+        </div>
+      </div>
+      <div class="agent-card anim-up delay-2">
+        <div class="agent-card-stripe" style="background:linear-gradient(90deg,transparent,#A855F7,transparent)"></div>
+        <div class="agent-card-top"><span class="agent-emoji">🎨</span><span class="agent-phase">Post-Production</span></div>
+        <div class="agent-name">Color Grading</div>
+        <div class="agent-desc">Detailed DaVinci Resolve recipes with exact numeric values, node structure, LUT recommendations, and plugin suggestions.</div>
+        <div class="agent-features">
+          <div class="agent-feature">Lift/gamma/gain with exact values</div>
+          <div class="agent-feature">Node tree structure described</div>
+          <div class="agent-feature">LOG to display transform guidance</div>
+        </div>
+      </div>
+      <div class="agent-card anim-up delay-3">
+        <div class="agent-card-stripe" style="background:linear-gradient(90deg,transparent,#10B981,transparent)"></div>
+        <div class="agent-card-top"><span class="agent-emoji">🎵</span><span class="agent-phase">Post-Production</span></div>
+        <div class="agent-name">Audio Designer</div>
+        <div class="agent-desc">Music BPM and genre recommendations, royalty-free sources, SFX placement, and per-platform LUFS targets.</div>
+        <div class="agent-features">
+          <div class="agent-feature">YouTube −14 LUFS, TikTok −14</div>
+          <div class="agent-feature">Royalty-free source search terms</div>
+          <div class="agent-feature">Dialogue/music/SFX mixing levels</div>
+        </div>
+      </div>
+      <div class="agent-card anim-up delay-1">
+        <div class="agent-card-stripe" style="background:linear-gradient(90deg,transparent,#F59E0B,transparent)"></div>
+        <div class="agent-card-top"><span class="agent-emoji">🖼️</span><span class="agent-phase">Distribution</span></div>
+        <div class="agent-name">Thumbnail Director</div>
+        <div class="agent-desc">3 distinct thumbnail concepts with hex color palettes, text overlay copy under 5 words, and A/B test strategy.</div>
+        <div class="agent-features">
+          <div class="agent-feature">Mobile-optimized contrast analysis</div>
+          <div class="agent-feature">Hex palette per concept</div>
+          <div class="agent-feature">Emotion and pose direction</div>
+        </div>
+      </div>
+      <div class="agent-card anim-up delay-2">
+        <div class="agent-card-stripe" style="background:linear-gradient(90deg,transparent,#06B6D4,transparent)"></div>
+        <div class="agent-card-top"><span class="agent-emoji">💬</span><span class="agent-phase">Distribution</span></div>
+        <div class="agent-name">Caption Writer</div>
+        <div class="agent-desc">SRT-formatted subtitles, social media copy, YouTube descriptions, and platform-specific caption specs.</div>
+        <div class="agent-features">
+          <div class="agent-feature">SRT output ready to import</div>
+          <div class="agent-feature">Hook + hashtag copy for each platform</div>
+          <div class="agent-feature">Reading speed compliance (17 ch/s)</div>
+        </div>
+      </div>
+      <div class="agent-card anim-up delay-3">
+        <div class="agent-card-stripe" style="background:linear-gradient(90deg,transparent,#8B5CF6,transparent)"></div>
+        <div class="agent-card-top"><span class="agent-emoji">🔍</span><span class="agent-phase">Distribution</span></div>
+        <div class="agent-name">Edit Critic</div>
+        <div class="agent-desc">Honest assessment of your edit — technical issues, narrative problems, pacing critique, and a priority fix list.</div>
+        <div class="agent-features">
+          <div class="agent-feature">🔴 Critical → 🟡 Important → 🟢 Minor</div>
+          <div class="agent-feature">Drop-off risk point prediction</div>
+          <div class="agent-feature">Benchmark vs similar content</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="workflow" style="padding-top:0">
+  <div class="container">
+    <div class="workflow-section">
+      <div class="features-header anim-up" style="text-align:left;margin-bottom:0">
+        <div class="section-eyebrow">Workflow</div>
+        <h2 class="section-h2" style="margin:12px 0 0">From idea to upload,<br/><em>in one session.</em></h2>
+      </div>
+      <div class="workflow-steps">
+        <div class="workflow-step">
+          <div class="workflow-num">01</div>
+          <div class="workflow-step-icon">✍️</div>
+          <div class="workflow-step-name">Pre-Production</div>
+          <div class="workflow-step-desc">Script Writer locks your narrative. Shot List AI plans every camera angle before you pick up a camera.</div>
+          <div class="workflow-arrow">→</div>
+        </div>
+        <div class="workflow-step">
+          <div class="workflow-num">02</div>
+          <div class="workflow-step-icon">🎥</div>
+          <div class="workflow-step-name">Generate or Shoot</div>
+          <div class="workflow-step-desc">Use Video Generator to build AI video prompts, or take your shot list to the field and shoot with confidence.</div>
+          <div class="workflow-arrow">→</div>
+        </div>
+        <div class="workflow-step">
+          <div class="workflow-num">03</div>
+          <div class="workflow-step-icon">✂️</div>
+          <div class="workflow-step-name">Post-Production</div>
+          <div class="workflow-step-desc">Edit Pacing, Color Grading, and Audio Designer work your rough cut into a polished final.</div>
+          <div class="workflow-arrow">→</div>
+        </div>
+        <div class="workflow-step">
+          <div class="workflow-num">04</div>
+          <div class="workflow-step-icon">🚀</div>
+          <div class="workflow-step-name">Publish</div>
+          <div class="workflow-step-desc">Thumbnail Director, Caption Writer, and Edit Critic get your video optimized and ready to upload.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section" style="padding:0">
+  <div class="container">
+    <div class="stats-grid" style="border:1px solid var(--rim);border-radius:16px;overflow:hidden">
+      <div class="stat-item anim-up delay-1"><div class="stat-num">9</div><div class="stat-label">AI Agents</div></div>
+      <div class="stat-item anim-up delay-2"><div class="stat-num">4</div><div class="stat-label">Production Phases</div></div>
+      <div class="stat-item anim-up delay-3"><div class="stat-num">∞</div><div class="stat-label">Pro Requests</div></div>
+      <div class="stat-item anim-up delay-4"><div class="stat-num">$0</div><div class="stat-label">To Start</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="features-header anim-up">
+      <div class="section-eyebrow">Pricing</div>
+      <h2 class="section-h2">Simple, <em>transparent</em> pricing.</h2>
+      <p class="section-sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card anim-up delay-1">
+        <div class="price-tier">Free</div>
+        <div class="price-amount">$0</div>
+        <div class="price-period">forever</div>
+        <ul class="price-features">
+          <li>20 credits on signup</li>
+          <li>Script Writer</li>
+          <li>Shot List AI</li>
+          <li>Video Generator</li>
+          <li class="muted">Post-production agents</li>
+          <li class="muted">Distribution agents</li>
+          <li class="muted">Export history</li>
+        </ul>
+        <a href="app.html" class="price-cta">Get started free</a>
+      </div>
+      <div class="price-card featured anim-up delay-2">
+        <div class="price-tier">Pro</div>
+        <div class="price-amount">$12</div>
+        <div class="price-period">/month · cancel anytime</div>
+        <ul class="price-features">
+          <li>Unlimited AI requests</li>
+          <li>All 9 agents unlocked</li>
+          <li>Video Generator</li>
+          <li>Priority response speed</li>
+          <li>Export chat history</li>
+          <li class="muted">Team seats</li>
+          <li class="muted">White-label</li>
+        </ul>
+        <a href="app.html" class="price-cta primary">Start Pro →</a>
+      </div>
+      <div class="price-card anim-up delay-3">
+        <div class="price-tier">Studio</div>
+        <div class="price-amount">$39</div>
+        <div class="price-period">/month</div>
+        <ul class="price-features">
+          <li>Everything in Pro</li>
+          <li>5 team seats</li>
+          <li>White-label branding</li>
+          <li>Dedicated API proxy</li>
+          <li>Priority support</li>
+          <li>Custom AI personas</li>
+          <li>Usage analytics</li>
+        </ul>
+        <a href="app.html" class="price-cta">Get Studio →</a>
+      </div>
+    </div>
+    <div class="pricing-note">🔒 Secure checkout · Cancel anytime · Need just a few requests? <a href="app.html" style="color:var(--a);text-decoration:none">Buy credit packs from $4.99 →</a></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="features-header anim-up" style="margin-bottom:48px">
+      <div class="section-eyebrow">FAQ</div>
+      <h2 class="section-h2">Common <em>questions.</em></h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item anim-up delay-1">
+        <div class="faq-q">What are credits?</div>
+        <div class="faq-a">Each AI request (a message or a video prompt generation) costs 1 credit. Free accounts start with 20. Credits never expire and can be purchased in packs. Pro and Studio plans have unlimited requests.</div>
+      </div>
+      <div class="faq-item anim-up delay-2">
+        <div class="faq-q">Is my data secure?</div>
+        <div class="faq-a">Yes. Your conversations are stored locally in your browser by default. Your Anthropic API key is proxied through our secure backend — it's never exposed in the client. Passwords are hashed with bcrypt.</div>
+      </div>
+      <div class="faq-item anim-up delay-3">
+        <div class="faq-q">Does VidAI actually edit my videos?</div>
+        <div class="faq-a">VidAI is an AI advisor, not an NLE. It gives you expert-level scripts, shot lists, color recipes, and audio guidance that you implement in your own editor (Premiere, DaVinci, Final Cut). Think of it as a senior producer in your pocket.</div>
+      </div>
+      <div class="faq-item anim-up delay-4">
+        <div class="faq-q">Which video generators does it support?</div>
+        <div class="faq-a">The Video Generator crafts optimized prompts for Kling 3.0, Sora 2, Veo 3.1, and Seedance via Nano Banana. One click opens your prompt directly in the right tool.</div>
+      </div>
+      <div class="faq-item anim-up delay-1">
+        <div class="faq-q">Can I cancel anytime?</div>
+        <div class="faq-a">Yes, absolutely. Cancel from the billing portal inside the app with no questions asked. Your credits and history remain accessible until your billing period ends.</div>
+      </div>
+      <div class="faq-item anim-up delay-2">
+        <div class="faq-q">What's the daily streak for?</div>
+        <div class="faq-a">Consistent creators make better content. The streak tracks your daily visits and encourages regular use — the same way pros show up to their edit suite every day, not just when inspiration strikes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="container">
+    <div class="cta-section anim-up">
+      <div class="section-eyebrow" style="justify-content:center">Start today — it's free</div>
+      <h2 class="cta-h2">Your next video starts<br/><em>right now.</em></h2>
+      <p class="cta-sub">20 free credits. No card required. Nine AI agents ready to work on your next project.</p>
+      <a href="app.html" class="btn-hero primary" style="font-size:16px;padding:16px 40px">Open VidAI Studio →</a>
+      <div class="cta-guarantee">
+        <span>🔒 No credit card</span>
+        <span style="opacity:.3">·</span>
+        <span>20 free credits</span>
+        <span style="opacity:.3">·</span>
+        <span>Cancel anytime</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-brand-name">Vid<em>AI</em></div>
+        <div class="footer-brand-desc">Professional AI video production studio. Nine agents for every phase.</div>
+      </div>
+      <div class="footer-links">
+        <div>
+          <div class="footer-col-title">Product</div>
+          <a href="#features" class="footer-link">Features</a>
+          <a href="#pricing" class="footer-link">Pricing</a>
+          <a href="app.html" class="footer-link">Open App</a>
+          <a href="#" class="footer-link">Changelog</a>
+        </div>
+        <div>
+          <div class="footer-col-title">Resources</div>
+          <a href="#faq" class="footer-link">FAQ</a>
+          <a href="#" class="footer-link">Documentation</a>
+          <a href="#" class="footer-link">Status</a>
+          <a href="mailto:support@vidai.app" class="footer-link">Support</a>
+        </div>
+        <div>
+          <div class="footer-col-title">Legal</div>
+          <a href="#" class="footer-link">Privacy Policy</a>
+          <a href="#" class="footer-link">Terms of Service</a>
+          <a href="#" class="footer-link">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 VidAI. Built with Claude Sonnet.</div>
+      <div class="footer-badges">
+        <span class="footer-badge">🔒 SOC 2 ready</span>
+        <span class="footer-badge">⚡ 99.9% uptime</span>
+        <span class="footer-badge">🌍 GDPR compliant</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll nav effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// Intersection observer for animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationPlayState = 'running';
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.anim-up').forEach(el => {
+  el.style.animationPlayState = 'paused';
+  observer.observe(el);
+});
+
+// Smooth anchor scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// Typing animation dots in mockup
+const dots = document.querySelectorAll('.mockup-dot-anim');
+dots.forEach((d, i) => {
+  d.style.animation = `pulse ${1.2}s ease-in-out ${i * 0.2}s infinite`;
+});
+</script>
+</body>
+</html>
